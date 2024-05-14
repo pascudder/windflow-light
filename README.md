@@ -24,8 +24,9 @@ of the form `gp_yyyy-mm-dd_HH:MM:SS_P[pressurelvl]_out.nc`
 
 fields:
 
-| gp_newP | specific humidity |
+| Field | long name |
 | --- | --- |
+| gp_newP | specific humidity |
 | lev_p | pressure level |
 | lat_0 | latitude |
 | lon_0 | longitude |
@@ -38,8 +39,9 @@ of the form `uv_yyyy-mm-dd_HH:MM:SS_P[pressure level]_out.nc`
 
 fields:
 
-| ugrd_newP | U component of wind |
+| Field | long name |
 | --- | --- |
+| ugrd_newP | U component of wind |
 | vgrd_newP | V component of wind |
 | lat_0 | latitude |
 | lon_0 | longitude |
