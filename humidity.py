@@ -8,8 +8,8 @@ import netCDF4 as nc
 
 # read UV
 print('reading UV')
-uv_1 = xr.open_dataset('/data/daves/ECO1280/uv_2016-06-01_00:00:00_P500_out.nc')
-uv_2 = xr.open_dataset('/data/daves/ECO1280/uv_2016-06-01_03:00:00_P500_out.nc')
+uv_1 = xr.open_dataset('./data/uv_2016-06-01_00:00:00_P500_out.nc')
+uv_2 = xr.open_dataset('./data/uv_2016-06-01_03:00:00_P500_out.nc')
 
 u1 = uv_1['ugrd_newP'] # do I need to reshape these? (1801, 3600, 1)
 v1 = uv_1['vgrd_newP']
@@ -37,8 +37,8 @@ inference = inference_flows.FlowRunner('RAFT',
                                      batch_size=1)
 inference.load_checkpoint(checkpoint_file)
 
-file1 = '/data/daves/ECO1280/gp_2016-06-01_00:00:00_P500_out.nc'
-file2 = '/data/daves/ECO1280/gp_2016-06-01_03:00:00_P500_out.nc'
+file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
+file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
 gp_1 = Eco(file1)
 gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)

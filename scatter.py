@@ -8,13 +8,13 @@ from scipy.interpolate import interpn
 
 
 def main():
-    file1 = '/data/daves/ECO1280/uv_2016-06-01_00:00:00_P500_out.nc'
-    file2 = '/data/daves/ECO1280/uv_2016-06-01_03:00:00_P500_out.nc'
+    file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc'
+    file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
 
     Eco_u, Eco_v, lat, _ = load_eco1280(file1, file2)
 
-    file1 = '/data/daves/ECO1280/gp_2016-06-01_00:00:00_P500_out.nc'
-    file2 = '/data/daves/ECO1280/gp_2016-06-01_03:00:00_P500_out.nc'
+    file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
+    file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
     W_u, W_v, W_lat, _ = load_windflow(file1, file2)
 
