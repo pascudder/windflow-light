@@ -48,7 +48,7 @@ gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
 gp_rad1 = gp_ds1['gp_newP']
 print(np.min(gp_rad1), np.max(gp_rad1))
 gp_rad2 = gp_ds2['gp_newP']
-raise Exception
+
 try:
     shape = np.shape(gp_rad1)
     gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1]))

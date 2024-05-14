@@ -2,7 +2,7 @@
 
 Perform optical flow inference on geostationary satellite images from a pretrained RAFT model. 
 
-![windflow example](./example-flows.png)
+![windflow example](./examples/example-flows.png)
 
 See  `python predict.py` for a basic example.
 
