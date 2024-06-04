@@ -23,8 +23,7 @@ def main():
 
     assert np.all(lat == W_lat)
 
-    expanded_lat = np.tile(lat, (3600, 1)).T 
-    print("Shape of expanded_lat:", expanded_lat.shape) #debugging
+    expanded_lat = np.tile(lat, (3600, 1)).T #reshaped to (1801,3600)
     
     mask = (expanded_lat <= 30) & (expanded_lat >= -30) # mask super northern and southern regions
                                                         #NEEDS CLARIFICATION - is this selecting the region between 30 degrees N and 30 degrees S? Seems too small.
@@ -112,7 +111,7 @@ def load_eco1280(file1, file2):
     u1 = uv_1['ugrd_newP'] 
     v1 = uv_1['vgrd_newP']
 
-    #remove 3rd dimension - value is 1 because input data should be a single grid slice
+    #remove 3rd dimension
     Eco_u = u1.values.reshape((1801, 3600))
     Eco_v = v1.values.reshape((1801, 3600))
 
@@ -152,10 +151,9 @@ def load_windflow(file1, file2):
 
     try:
         shape = np.shape(gp_rad1)
-        gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1]))
-        gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1]))
-        print("Shape of reshaped gp_rad1:", gp_rad1.shape) #debugging
-        print("Shape of reshaped gp_rad2:", gp_rad2.shape) #debugging
+        gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
+        gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
+       
     except ValueError as e:
         print(e)
         raise
