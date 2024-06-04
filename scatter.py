@@ -26,7 +26,7 @@ def main():
     expanded_lat = np.tile(lat, (3600, 1)).T #reshaped to (1801,3600)
     
     mask = (expanded_lat <= 30) & (expanded_lat >= -30) # mask super northern and southern regions
-                                                        #NEEDS CLARIFICATION - is this selecting the region between 30 degrees N and 30 degrees S? Seems too small.
+                                                        #This range seems small - consider working with higher values?
 
     lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
 
