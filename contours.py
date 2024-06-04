@@ -37,44 +37,56 @@ plt.title('ECO1280')
 plt.tight_layout()
 plt.savefig('contour_quivers_eco.png')
 
+def load_windflow(file1, file2):
 
-import torch
-torch.device('cpu')
-import numpy as np
-from windflow import inference_flows
-from windflow.datasets.daves_grids import Eco
+    # read windflow
+    print('reading windflow')
+    import torch
+    torch.device('cpu')
+    import numpy as np
+    from windflow import inference_flows
+    from windflow.datasets.daves_grids import Eco
 
-checkpoint_file = 'model_weights/windflow.raft.pth.tar'
-inference = inference_flows.FlowRunner('RAFT',
-                                     overlap=128,
-                                     tile_size=512,
-                                     device=torch.device('cpu'),
-                                     batch_size=1)
-inference.load_checkpoint(checkpoint_file)
+    checkpoint_file = 'model_weights/windflow.raft.pth.tar'
+    inference = inference_flows.FlowRunner('RAFT',
+                                        overlap=128,
+                                        tile_size=512,
+                                        device=torch.device('cpu'),
+                                        batch_size=1)
+    inference.load_checkpoint(checkpoint_file)
+
+    gp_1 = Eco(file1)
+    gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
+    gp_2 = Eco(file2)
+    gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
+
+    gp_rad1 = gp_ds1['gp_newP'] 
+    gp_rad2 = gp_ds2['gp_newP']
+    lat = gp_ds1['lat_0'].values
+    lon = gp_ds1['lon_0'].values
+
+    try:
+        shape = np.shape(gp_rad1)
+        gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
+        gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
+       
+    except ValueError as e:
+        print(e)
+        raise
+
+    # pass 2D humidity grid into windflow 
+    _, flows = inference.forward(gp_rad1, gp_rad2)
+
+    W_u = flows[0]
+    W_v = flows[1]
+
+    return W_u, -W_v, lat, lon
 
 file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
 file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
-gp_1 = Eco(file1)
-gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
-gp_2 = Eco(file2)
-gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
+u, v, lat, _ = load_windflow(file1, file2)
 
-gp_rad1 = gp_ds1['gp_newP']
-gp_rad2 = gp_ds2['gp_newP']
-
-try:
-    shape = np.shape(gp_rad1)
-    gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1]))
-    gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1]))
-except ValueError as e:
-    print(e)
-    raise
-
-_, flows = inference.forward(gp_rad1, gp_rad2)
-
-u = flows[0]
-v = flows[1]
 # do calculations convert pixel to m/s
 expanded_lat = np.tile(lat, (3600, 1)).T #reshaped to (1801,3600)
 u = (u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800
