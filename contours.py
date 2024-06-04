@@ -75,22 +75,26 @@ _, flows = inference.forward(gp_rad1, gp_rad2)
 
 u = flows[0]
 v = flows[1]
+# do calculations convert pixel to m/s
+expanded_lat = np.tile(lat, (3600, 1)).T #reshaped to (1801,3600)
+u = (u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800
+v = (v * 0.1 * 111 * 1000) / 10800
 
 ws = (u**2 + v**2)**0.5
 max_ws = np.nanmax(ws)
 print("Maximum wind speed:", max_ws)
-c_inv = np.arange(0, 60, 1)
+c_inv = np.arange(0, 80, 1)
 fig = plt.figure(figsize=(13,7))
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax.coastlines(color='white')
 plt.contourf(lon, lat, ws, c_inv, transform=ccrs.PlateCarree(),cmap=plt.cm.jet) # takes some time
 
 cb = plt.colorbar(ax=ax, orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
-cb.set_label('pixels',size=10,rotation=0,labelpad=15)
+cb.set_label('m/s',size=10,rotation=0,labelpad=15)
 cb.ax.tick_params(labelsize=10)
 
 # splice array:
 qv = plt.quiver(lon[::60], lat[::40], u[::40, ::60], v[::40, ::60], color='k')
 plt.tight_layout()
-plt.title('Windflow pixel displacement')
+plt.title('Windflow displacement')
 plt.savefig('contour_quivers_windflow.png')
