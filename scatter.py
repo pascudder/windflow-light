@@ -8,11 +8,14 @@ from scipy.interpolate import interpn
 
 
 def main():
-    file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc'
+    
+    #True wind data
+    file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc' 
     file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
 
     Eco_u, Eco_v, lat, _ = load_eco1280(file1, file2)
 
+    #Humidity grid to be passed into windflow - shape is (1801, 3600, 1)
     file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
     file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
@@ -20,13 +23,15 @@ def main():
 
     assert np.all(lat == W_lat)
 
-    expanded_lat = np.tile(lat, (3600, 1)).T
+    expanded_lat = np.tile(lat, (3600, 1)).T 
+    print("Shape of expanded_lat:", expanded_lat.shape) #debugging
+    
+    mask = (expanded_lat <= 30) & (expanded_lat >= -30) # mask super northern and southern regions
+                                                        #NEEDS CLARIFICATION - is this selecting the region between 30 degrees N and 30 degrees S? Seems too small.
 
-    # mask super northern and southern regions
-    mask = (expanded_lat <= 30) & (expanded_lat >= -30)
+    lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
 
-    # convert latitude from degrees to radians
-    lat_mask = np.radians(expanded_lat[mask])
+    #select masked regions
     Eu_mask = Eco_u[mask]
     Ev_mask = Eco_v[mask]
 
@@ -37,13 +42,13 @@ def main():
     Wu_mask = (Wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800
     Wv_mask = (Wv_mask * 0.1 * 111 * 1000) / 10800
 
+    # calculate MSE of the u component
     x = Eu_mask
     y = Wu_mask
     
     print(f'MSE: u: {np.nanmean((y-x)**2)}')
 
-
-    # plot u component 
+    #U component plots
     ax = scatter(x, y, s=1, textbox=(-18, 55))
     ax.set_xlim(-20, 40)
     ax.set_ylim(-20, 40)
@@ -67,12 +72,13 @@ def main():
     ax.set_ylabel('Latitude')
     #plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png")
 
+    #calculate MSE of v component
     x = Ev_mask
     y = Wv_mask
 
     print(f'MSE: v: {np.nanmean((y-x)**2)}')
 
-    # plot v component
+    #V component plots
     ax = scatter(x, y, s=1, textbox=(-18, 35))
     #ax.set_xlim(-40, 40)
     #ax.set_ylim(-40, 40)
@@ -103,9 +109,10 @@ def load_eco1280(file1, file2):
     uv_1 = xr.open_dataset(file1)
     uv_2 = xr.open_dataset(file2)
 
-    u1 = uv_1['ugrd_newP'] # do I need to reshape these? (1801, 3600, 1)
+    u1 = uv_1['ugrd_newP'] 
     v1 = uv_1['vgrd_newP']
 
+    #remove 3rd dimension - value is 1 because input data should be a single grid slice
     Eco_u = u1.values.reshape((1801, 3600))
     Eco_v = v1.values.reshape((1801, 3600))
 
@@ -138,7 +145,7 @@ def load_windflow(file1, file2):
     gp_2 = Eco(file2)
     gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
 
-    gp_rad1 = gp_ds1['gp_newP']
+    gp_rad1 = gp_ds1['gp_newP'] 
     gp_rad2 = gp_ds2['gp_newP']
     lat = gp_ds1['lat_0'].values
     lon = gp_ds1['lon_0'].values
@@ -147,11 +154,13 @@ def load_windflow(file1, file2):
         shape = np.shape(gp_rad1)
         gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1]))
         gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1]))
+        print("Shape of reshaped gp_rad1:", gp_rad1.shape) #debugging
+        print("Shape of reshaped gp_rad2:", gp_rad2.shape) #debugging
     except ValueError as e:
         print(e)
         raise
 
-    # pass humidity grids into windflow 
+    # pass 2D humidity grid into windflow 
     _, flows = inference.forward(gp_rad1, gp_rad2)
 
     W_u = flows[0]
