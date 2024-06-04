@@ -6,7 +6,7 @@ import cartopy.crs as ccrs
 uv_1 = xr.open_dataset('./data/uv_2016-06-01_00:00:00_P500_out.nc')
 uv_2 = xr.open_dataset('./data/uv_2016-06-01_03:00:00_P500_out.nc')
 
-u1 = uv_1['ugrd_newP'] # do I need to reshape these? (1801, 3600, 1)
+u1 = uv_1['ugrd_newP']
 v1 = uv_1['vgrd_newP']
 
 u = u1.values.reshape((1801, 3600))
@@ -16,7 +16,9 @@ lat = uv_1['lat_0'].values
 lon = uv_1['lon_0'].values
 
 ws = (u**2 + v**2)**0.5
-c_inv = np.arange(0, 80, 5)
+max_ws = np.nanmax(ws)
+print("Maximum wind speed:", max_ws)
+c_inv = np.arange(0, 80, 1)
 fig = plt.figure(figsize=(13,7))
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax.coastlines(color='white')
@@ -75,7 +77,9 @@ u = flows[0]
 v = flows[1]
 
 ws = (u**2 + v**2)**0.5
-c_inv = np.arange(0, 70, 5)
+max_ws = np.nanmax(ws)
+print("Maximum wind speed:", max_ws)
+c_inv = np.arange(0, 60, 1)
 fig = plt.figure(figsize=(13,7))
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax.coastlines(color='white')
@@ -89,5 +93,4 @@ cb.ax.tick_params(labelsize=10)
 qv = plt.quiver(lon[::60], lat[::40], u[::40, ::60], v[::40, ::60], color='k')
 plt.tight_layout()
 plt.title('Windflow pixel displacement')
-#plt.savefig('contour_quivers_windflow.png')
-plt.show()
+plt.savefig('contour_quivers_windflow.png')
