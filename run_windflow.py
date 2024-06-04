@@ -63,5 +63,4 @@ def save_data():
         gp_ra1[:, :] = gp_rad1
         gp_ra2[:, :] = gp_rad2
 
-
 save_data()
