@@ -50,7 +50,7 @@ def main():
     ax.set_title("2016-06-01 00:00:00 P500 U component -30 to 30 lat")
     ax.set_xlabel('ECO1280 u-component m/s')
     ax.set_ylabel('Windflow u-component m/s')
-    plt.savefig("scatter.ucomp_500_90to90_pixel.png")
+    #plt.savefig("scatter.ucomp_500_90to90_pixel.png")
 
     ax = density_scatter(x, y, s=1, bins=150)
     ax.set_xlim(-20, 40)
@@ -58,14 +58,14 @@ def main():
     ax.set_title("2016-06-01 00:00:00 P500 U component density -30 to 30 lat")
     ax.set_xlabel('ECO1280 u-component m/s')
     ax.set_ylabel('Windflow u-component m/s')
-    plt.savefig("scatter_density.ucomp_500_30to30_pixel.png")
+    #plt.savefig("scatter_density.ucomp_500_30to30_pixel.png")
 
     udiff = (y - x)
     ax = scatter(udiff, expanded_lat[mask], axline=False)
     ax.set_title("2016-06-01 00:00:00 P500 U diff (windflow - eco) vs lat")
     ax.set_xlabel('Udiff u-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
-    plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png")
+    #plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png")
 
     x = Ev_mask
     y = Wv_mask
@@ -79,7 +79,7 @@ def main():
     ax.set_title("2016-06-01 00:00:00 P500 V component 30 to 30 lat")
     ax.set_xlabel('ECO1280 v-component m/s')
     ax.set_ylabel('Windflow v-component m/s')
-    plt.savefig("scatter.vcomp_500_60to90_pixel.png")
+    #plt.savefig("scatter.vcomp_500_60to90_pixel.png")
 
     ax = density_scatter(x, y, s=1, bins=150)
     ax.set_xlim(-20, 40)
@@ -87,14 +87,14 @@ def main():
     ax.set_title("2016-06-01 00:00:00 P500 V component density -30 to 30 lat")
     ax.set_xlabel('ECO1280 v-component m/s')
     ax.set_ylabel('Windflow v-component m/s')
-    plt.savefig("scatter_density.vcomp_500_30to30_pixel.png")
+    #plt.savefig("scatter_density.vcomp_500_30to30_pixel.png")
 
     vdiff = (y - x)
     ax = scatter(vdiff, expanded_lat[mask], axline=False)
     ax.set_title("2016-06-01 00:00:00 P500 V diff (windflow - eco) vs lat")
     ax.set_xlabel('Vdiff v-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
-    plt.savefig("scatter_lat.vcomp_500_90to90_pixel.png")
+    #plt.savefig("scatter_lat.vcomp_500_90to90_pixel.png")
 
 
 def load_eco1280(file1, file2):
