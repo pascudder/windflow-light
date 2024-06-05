@@ -24,7 +24,7 @@ assert np.all(lat == w_lat)
 #calculate windspeed and plot
 ws = (eco_u**2 + eco_v**2)**0.5
 max_ws = np.nanmax(ws)
-print("Maximum wind speed:", max_ws)
+print("Eco maximum wind speed:", max_ws)
 c_inv = np.arange(0, 80, 1)
 fig = plt.figure(figsize=(13,7))
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -44,14 +44,14 @@ plt.tight_layout()
 plt.savefig('contour_quivers_eco.png',dpi = 300)
 
 #convert from pixels to m/s
-expanded_lat = np.radians(np.tile(lat, (3600, 1)).T)
-w_u = (w_u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800 #EXPANDED_LAT IS IN RADIANS
-w_v = (w_v * 0.1 * 111 * 1000) / 10800
+expanded_lat = np.radians(np.tile(lat, (3600, 1)).T) #EXPANDED LAT MUST BE IN RADIANS
+w_u = (w_u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800
+w_v = (w_v * 0.05 * 111 * 1000) / 10800
 
 #calculate windspeed and plot
 ws = (w_u**2 + w_v**2)**0.5
 max_ws = np.nanmax(ws)
-print("Maximum wind speed:", max_ws)
+print("Windflow maximum wind speed:", max_ws)
 c_inv = np.arange(0, 80, 1)
 fig = plt.figure(figsize=(13,7))
 ax = plt.axes(projection=ccrs.PlateCarree())

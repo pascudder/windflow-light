@@ -65,7 +65,7 @@ latitude, longitude, and pressure level are the same in both of these files.
 4. Convert Latitude / Longitude from degrees to radians and convert pixel displacement to meters/second
     
 $$
-\text{vcomp} = \text{vpixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
+\text{vcomp} = \text{vpixel}~ \cdot ~\frac{0.05 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
 $$
     
     remember to negate vpixel before doing this. 
@@ -74,12 +74,12 @@ $$
 convert pixel displacement to v component in units of m/s. Since these images are 3 hours apart, you divide by 3 * 60 * 60 = 10800 to get units of seconds. 
 
 $$
-\text{ucomp} = \frac{1}{cos(lat)} ~ \cdot ~ \text{upixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
+\text{ucomp} = \cos(lat) ~ \cdot ~ \text{upixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
 $$
 
 $\frac{1}{cos(lat)}$
 
-- This factor adjusts for the varying distance covered by a degree of longitude depending on the latitude. A degree of longitude represents a longer distance near the equator than it does closer to the poles. Since cos(lat) where latitude is in radians decreases as you move from the equator towards the poles, dividing by cos(lat) correctly adjusts the longitudinal distance covered per pixel.
+- This factor adjusts for the varying distance covered by a degree of longitude depending on the latitude. A degree of longitude represents a longer distance near the equator than it does closer to the poles. Since cos(lat) where latitude is in radians decreases as you move from the equator towards the poles, multiplying by cos(lat) correctly adjusts the longitudinal distance covered per pixel.
 
 There is density scatter, normal scatter, and plots with difference between real u/v and computed u/v. 
 

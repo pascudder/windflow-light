@@ -10,7 +10,7 @@ import netCDF4 as nc
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
                                      overlap=128,
-                                     tile_size=512,
+                                     tile_size=1024,
                                      device=torch.device('cpu'),
                                      batch_size=1)
 inference.load_checkpoint(checkpoint_file)
