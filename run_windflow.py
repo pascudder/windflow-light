@@ -41,8 +41,8 @@ except ValueError as e:
 
 _, flows = inference.forward(gp_rad1, gp_rad2)
 
-W_u = flows[0]
-W_v = flows[1]
+w_u = flows[0]
+w_v = flows[1]
 
 
 def save_data():
@@ -56,8 +56,8 @@ def save_data():
         flow1 = f.createVariable('uwind', np.float32, ('lat', 'lon'))
         flow2 = f.createVariable('vwind', np.float32, ('lat', 'lon'))
         
-        flow1[:, :] = W_u
-        flow2[:, :] = W_v
+        flow1[:, :] = w_u
+        flow2[:, :] = -w_v #flipping v parameter is now handled here
         lats[:] = lat
         lons[:] = lon
         gp_ra1[:, :] = gp_rad1
