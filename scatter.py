@@ -5,45 +5,47 @@ import cartopy.crs as ccrs
 from matplotlib import cm
 from matplotlib.colors import Normalize
 from scipy.interpolate import interpn
-
+from eco1280_loader import load_eco1280
+import netCDF4 as nc
 
 def main():
-    
-    #True wind data
+
+    #Load ECO1280 data
     file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc' 
     file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
+    eco_u, eco_v, lat, _ = load_eco1280(file1, file2)
 
-    Eco_u, Eco_v, lat, _ = load_eco1280(file1, file2)
 
-    #Humidity grid to be passed into windflow - shape is (1801, 3600, 1)
-    file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
-    file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
-
-    W_u, W_v, W_lat, _ = load_windflow(file1, file2)
-
-    assert np.all(lat == W_lat)
+    #Load windflow data (Run 'run_windflow.py' first)
+    print('loading windflow data')
+    with nc.Dataset('data.nc', 'r') as f:
+        w_lat = f.variables['lat'][:]
+        lon = f.variables['lon'][:]
+        gp_rad1 = f.variables['gp_rad1'][:]
+        gp_rad2 = f.variables['gp_rad2'][:]
+        w_u = f.variables['uwind'][:]
+        w_v = f.variables['vwind'][:]
+    assert np.all(lat == w_lat)
 
     expanded_lat = np.tile(lat, (3600, 1)).T #reshaped to (1801,3600)
-    
     mask = (expanded_lat <= 30) & (expanded_lat >= -30) # mask super northern and southern regions
                                                         #This range seems small - consider working with higher values?
-
     lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
 
     #select masked regions
-    Eu_mask = Eco_u[mask]
-    Ev_mask = Eco_v[mask]
+    eu_mask = eco_u[mask]
+    ev_mask = eco_v[mask]
 
-    Wu_mask = W_u[mask]
-    Wv_mask = W_v[mask]
+    wu_mask = w_u[mask]
+    wv_mask = w_v[mask]
 
     # do calculations convert pixel to m/s
-    Wu_mask = (Wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800
-    Wv_mask = (Wv_mask * 0.1 * 111 * 1000) / 10800
+    wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #LAT_MASK IS IN RADIANS
+    wv_mask = (wv_mask * 0.1 * 111 * 1000) / 10800
 
     # calculate MSE of the u component
-    x = Eu_mask
-    y = Wu_mask
+    x = eu_mask
+    y = wu_mask
     
     print(f'MSE: u: {np.nanmean((y-x)**2)}')
 
@@ -72,8 +74,8 @@ def main():
     #plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png")
 
     #calculate MSE of v component
-    x = Ev_mask
-    y = Wv_mask
+    x = ev_mask
+    y = wv_mask
 
     print(f'MSE: v: {np.nanmean((y-x)**2)}')
 
@@ -100,72 +102,6 @@ def main():
     ax.set_xlabel('Vdiff v-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
     #plt.savefig("scatter_lat.vcomp_500_90to90_pixel.png")
-
-
-def load_eco1280(file1, file2):
-    # read UV
-    print('reading UV')
-    uv_1 = xr.open_dataset(file1)
-    uv_2 = xr.open_dataset(file2)
-
-    u1 = uv_1['ugrd_newP'] 
-    v1 = uv_1['vgrd_newP']
-
-    #remove 3rd dimension
-    Eco_u = u1.values.reshape((1801, 3600))
-    Eco_v = v1.values.reshape((1801, 3600))
-
-    lat = uv_1['lat_0'].values
-    lon = uv_1['lon_0'].values
-    
-    return Eco_u, Eco_v, lat, lon
-
-
-def load_windflow(file1, file2):
-
-    # read windflow
-    print('reading windflow')
-    import torch
-    torch.device('cpu')
-    import numpy as np
-    from windflow import inference_flows
-    from windflow.datasets.daves_grids import Eco
-
-    checkpoint_file = 'model_weights/windflow.raft.pth.tar'
-    inference = inference_flows.FlowRunner('RAFT',
-                                        overlap=128,
-                                        tile_size=512,
-                                        device=torch.device('cpu'),
-                                        batch_size=1)
-    inference.load_checkpoint(checkpoint_file)
-
-    gp_1 = Eco(file1)
-    gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
-    gp_2 = Eco(file2)
-    gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
-
-    gp_rad1 = gp_ds1['gp_newP'] 
-    gp_rad2 = gp_ds2['gp_newP']
-    lat = gp_ds1['lat_0'].values
-    lon = gp_ds1['lon_0'].values
-
-    try:
-        shape = np.shape(gp_rad1)
-        gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
-        gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1])) #reshaped to (1801,3600)
-       
-    except ValueError as e:
-        print(e)
-        raise
-
-    # pass 2D humidity grid into windflow 
-    _, flows = inference.forward(gp_rad1, gp_rad2)
-
-    W_u = flows[0]
-    W_v = flows[1]
-
-    return W_u, -W_v, lat, lon
-
 
 def scatter(x, y, s=1, textbox=(0, 0), axline=True):
     fig, ax = plt.subplots(figsize=(8,8))

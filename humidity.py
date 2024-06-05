@@ -5,30 +5,28 @@ import xarray as xr
 import numpy as np
 import cartopy.crs as ccrs
 import netCDF4 as nc
+from eco1280_loader import load_eco1280
 
-# read ECO data
-print('reading UV')
-uv_1 = xr.open_dataset('./data/uv_2016-06-01_00:00:00_P500_out.nc')
-uv_2 = xr.open_dataset('./data/uv_2016-06-01_03:00:00_P500_out.nc')
+#Load ECO1280 data
+file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc' 
+file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
+eco_u, eco_v, lat, _ = load_eco1280(file1, file2)
 
-u1 = uv_1['ugrd_newP']
-v1 = uv_1['vgrd_newP']
-
-eco_u = u1.values.reshape((1801, 3600))
-eco_v = v1.values.reshape((1801, 3600))
-
-lat = uv_1['lat_0'].values
-lon = uv_1['lon_0'].values
-
-#read windflow data (Run 'run_windflow.py' first)
-print('reading windflow data')
+#Load windflow data (Run 'run_windflow.py' first)
+print('loading windflow data')
 with nc.Dataset('data.nc', 'r') as f:
-    lat = f.variables['lat'][:]
+    w_lat = f.variables['lat'][:]
     lon = f.variables['lon'][:]
     gp_rad1 = f.variables['gp_rad1'][:]
     gp_rad2 = f.variables['gp_rad2'][:]
     w_u = f.variables['uwind'][:]
     w_v = f.variables['vwind'][:]
+assert np.all(lat == w_lat)
+
+#convert from pixels to m/s
+expanded_lat = np.radians(np.tile(lat, (3600, 1)).T)
+w_u = (w_u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800 #EXPANDED_LAT IS IN RADIANS
+w_v = (w_v * 0.1 * 111 * 1000) / 10800
 
 #plot
 projection = ccrs.PlateCarree()
@@ -78,8 +76,6 @@ ax.coastlines(color='white')
 plt.tight_layout()
 #plt.savefig('humidity_quivers_windflow2.png', dpi=300)
 plt.close()
-
-
 
 
 '''#barbs
