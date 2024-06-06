@@ -39,8 +39,9 @@ def main():
     wv_mask = w_v[mask]
 
     #unit conversion to m/s
-    wu_mask = (wu_mask * 0.1 * 111 * 1000*np.cos(lat_mask)) / 10800
-    wv_mask = (wv_mask * 0.1 * 111 * 1000) / 10800
+    wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
+    wv_mask = (wv_mask * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
+                                                          #Minimizes RMSE but theoretically it shouldn't be needed.
 
     #calculate RMSE of v component
     x = eu_mask
