@@ -43,10 +43,21 @@ plt.title('ECO1280')
 plt.tight_layout()
 plt.savefig('contour_quivers_eco.png',dpi = 300)
 
-#convert from pixels to m/s
-expanded_lat = np.radians(np.tile(lat, (3600, 1)).T) #EXPANDED LAT MUST BE IN RADIANS
-w_u = (w_u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800
-w_v = (w_v * 0.05 * 111 * 1000) / 10800
+
+expanded_lat = np.tile(lat, (3600,1)).T
+mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
+lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
+
+#select masked regions
+eu_mask = eco_u[mask]
+ev_mask = eco_v[mask]
+
+wu_mask = w_u[mask]
+wv_mask = w_v[mask]
+
+#unit conversion to m/s
+wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800
+wv_mask = (wv_mask * 0.1 * 111 * 1000) / 10800
 
 #calculate windspeed and plot
 ws = (w_u**2 + w_v**2)**0.5

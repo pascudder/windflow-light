@@ -1,4 +1,3 @@
-print('reading windflow')
 import torch
 torch.device('cpu')
 import numpy as np
@@ -19,9 +18,9 @@ file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
 file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
 gp_1 = Eco(file1)
-gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
+gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=False)
 gp_2 = Eco(file2)
-gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
+gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=False)
 
 lat = gp_ds1['lat_0'].values
 lon = gp_ds1['lon_0'].values

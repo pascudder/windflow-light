@@ -65,7 +65,7 @@ latitude, longitude, and pressure level are the same in both of these files.
 4. Convert Latitude / Longitude from degrees to radians and convert pixel displacement to meters/second
     
 $$
-\text{vcomp} = \text{vpixel}~ \cdot ~\frac{0.05 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
+\text{vcomp} = \text{vpixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
 $$
     
     remember to negate vpixel before doing this. 

@@ -23,10 +23,20 @@ with nc.Dataset('data.nc', 'r') as f:
     w_v = f.variables['vwind'][:]
 assert np.all(lat == w_lat)
 
-#convert from pixels to m/s
-expanded_lat = np.radians(np.tile(lat, (3600, 1)).T)
-w_u = (w_u * 0.1 * 111 * 1000 * np.cos(expanded_lat)) / 10800 #EXPANDED_LAT IS IN RADIANS
-w_v = (w_v * 0.05 * 111 * 1000) / 10800
+expanded_lat = np.tile(lat, (3600,1)).T
+mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
+lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
+
+#select masked regions
+eu_mask = eco_u[mask]
+ev_mask = eco_v[mask]
+
+wu_mask = w_u[mask]
+wv_mask = w_v[mask]
+
+#unit conversion to m/s
+wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800
+wv_mask = (wv_mask * 0.1 * 111 * 1000) / 10800
 
 #plot
 projection = ccrs.PlateCarree()
@@ -40,7 +50,7 @@ cbar = plt.colorbar(im, ax=ax, shrink=0.7, label='Humidity kg kg-1')
 ax.coastlines(color='white')
 plt.title('ECO1280 Humidity - Snapshot 1')
 plt.tight_layout()
-#plt.savefig('humidity_quivers_eco1.png', dpi=300)
+#plt.savefig('humidity_quivers_eco1.png',bbox_inches='tight', dpi=300)
 plt.close()
 
 # ECO1280 time 2
@@ -51,7 +61,7 @@ cbar = plt.colorbar(im, ax=ax, shrink = 0.7, label='Humidity kg kg-1')
 plt.title('ECO1280 Humidity - Snapshot 2')
 ax.coastlines(color='white')
 plt.tight_layout()
-plt.savefig('humidity_quivers_eco2.png', dpi=300)
+plt.savefig('humidity_quivers_eco2.png',bbox_inches='tight', dpi=300)
 plt.close()
 
 
@@ -63,7 +73,7 @@ cbar = plt.colorbar(im, shrink=0.7, ax=ax, label='Humidity kg kg-1')
 plt.title('Windflow Humidity - Snapshot 1')
 ax.coastlines(color='white')
 plt.tight_layout()
-#plt.savefig('humidity_quivers_windflow.png', dpi=300)
+#plt.savefig('humidity_quivers_windflow.png',bbox_inches='tight', dpi=300)
 plt.close()
 
 # windflow time 2
@@ -74,6 +84,6 @@ cbar = plt.colorbar(im, ax=ax, shrink = 0.7, label='Humidity kg kg-1')
 plt.title('Windflow Humidity - Snapshot 2')
 ax.coastlines(color='white')
 plt.tight_layout()
-plt.savefig('humidity_quivers_windflow2.png', dpi=300)
+plt.savefig('humidity_quivers_windflow2.png', bbox_inches='tight', dpi=300)
 plt.close()
 
