@@ -46,22 +46,15 @@ plt.savefig('contour_quivers_eco.png',dpi = 300)
 
 expanded_lat = np.tile(lat, (3600,1)).T
 mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
-lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
-
-#select masked regions
-eu_mask = eco_u[mask]
-ev_mask = eco_v[mask]
-
-wu_mask = w_u[mask]
-wv_mask = w_v[mask]
+lat_mask = np.radians(expanded_lat)  # convert latitude from degrees to radians
 
 #unit conversion to m/s
-wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
-wv_mask = (wv_mask * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
+wu_mask = (w_u * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
+wv_mask = (w_v * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
                                                         #Minimizes RMSE but theoretically it shouldn't be needed.
 
 #calculate windspeed and plot
-ws = (w_u**2 + w_v**2)**0.5
+ws = (wu_mask**2 + wv_mask**2)**0.5
 max_ws = np.nanmax(ws)
 print("Windflow maximum wind speed:", max_ws)
 c_inv = np.arange(0, 80, 1)
@@ -74,7 +67,7 @@ cb.set_label('m/s',size=10,rotation=0,labelpad=15)
 cb.ax.tick_params(labelsize=10)
 
 # splice array:
-qv = plt.quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='k')
+qv = plt.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='k')
 plt.tight_layout()
 plt.title('Windflow displacement')
 plt.savefig('contour_quivers_windflow.png',dpi = 300)

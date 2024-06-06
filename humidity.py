@@ -25,18 +25,11 @@ assert np.all(lat == w_lat)
 
 expanded_lat = np.tile(lat, (3600,1)).T
 mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
-lat_mask = np.radians(expanded_lat[mask])  # convert latitude from degrees to radians
-
-#select masked regions
-eu_mask = eco_u[mask]
-ev_mask = eco_v[mask]
-
-wu_mask = w_u[mask]
-wv_mask = w_v[mask]
+lat_mask = np.radians(expanded_lat)  # convert latitude from degrees to radians
 
 #unit conversion to m/s
-wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
-wv_mask = (wv_mask * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
+wu_mask = (w_u * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
+wv_mask = (w_v * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
                                                           #Minimizes RMSE but theoretically it shouldn't be needed.
 
 #plot
@@ -69,7 +62,7 @@ plt.close()
 # windflow time 1
 fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=(12, 7))
 im = ax.pcolormesh(lon, lat, gp_rad1, transform=projection, cmap=plt.cm.jet)
-qv = plt.quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='black', width=0.0015)
+qv = plt.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='black', width=0.0015)
 cbar = plt.colorbar(im, shrink=0.7, ax=ax, label='Humidity kg kg-1')
 plt.title('Windflow Humidity - Snapshot 1')
 ax.coastlines(color='white')
@@ -80,7 +73,7 @@ plt.close()
 # windflow time 2
 fig, ax = plt.subplots(subplot_kw={'projection': projection}, figsize=(12, 7))
 im = ax.pcolormesh(lon, lat, gp_rad2, transform=projection, cmap=plt.cm.jet)
-qv = plt.quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='black', width=0.0015)
+qv = plt.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='black', width=0.0015)
 cbar = plt.colorbar(im, ax=ax, shrink = 0.7, label='Humidity kg kg-1')
 plt.title('Windflow Humidity - Snapshot 2')
 ax.coastlines(color='white')
