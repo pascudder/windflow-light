@@ -37,7 +37,7 @@ fig, axes = plt.subplots(1, 2, subplot_kw={'projection': projection}, figsize=(2
 
 # Combined plot time 1
 ax = axes[0]
-im = ax.pcolormesh(lon, lat, gp_rad1, transform=projection, cmap=plt.cm.jet)
+im = ax.pcolormesh(lon, lat, gp_rad1, transform=projection, cmap=plt.cm.jet,vmax=140)
 qv_eco = ax.quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='black', width=0.0015, label='ECO1280')
 qv_wind = ax.quiver(lon[::60], lat[::40], wu_mask[::40, ::60].data, wv_mask[::40, ::60].data, color='red', width=0.0007, label='Windflow')
 cbar = plt.colorbar(im, ax=ax, shrink=0.7, label='Humidity kg kg-1')
@@ -47,7 +47,7 @@ ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.0))
 
 # Combined plot time 2
 ax = axes[1]
-im = ax.pcolormesh(lon, lat, gp_rad2, transform=projection, cmap=plt.cm.jet)
+im = ax.pcolormesh(lon, lat, gp_rad2, transform=projection, cmap=plt.cm.jet,vmax=140)
 qv_eco = ax.quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='black', width=0.0015, label='ECO1280')
 qv_wind = ax.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='red', width=0.0007, label='Windflow')
 cbar = plt.colorbar(im, ax=ax, shrink=0.7, label='Humidity kg kg-1')

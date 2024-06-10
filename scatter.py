@@ -27,7 +27,7 @@ def main():
     assert np.all(lat == w_lat)
 
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 90) & (expanded_lat >= -90) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
+    mask = (expanded_lat <= 80) & (expanded_lat >= -80) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
     lat_mask = np.radians(expanded_lat[mask])  # Convert latitude from degrees to radians
 
     # Select masked regions
