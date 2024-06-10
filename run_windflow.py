@@ -9,7 +9,7 @@ import netCDF4 as nc
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
                                      overlap=128,
-                                     tile_size=1024,
+                                     tile_size=512,
                                      device=torch.device('cpu'),
                                      batch_size=1)
 inference.load_checkpoint(checkpoint_file)
@@ -18,9 +18,9 @@ file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
 file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
 
 gp_1 = Eco(file1)
-gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=False)
+gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
 gp_2 = Eco(file2)
-gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=False)
+gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
 
 lat = gp_ds1['lat_0'].values
 lon = gp_ds1['lon_0'].values

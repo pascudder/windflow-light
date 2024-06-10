@@ -22,7 +22,7 @@ with nc.Dataset('data.nc', 'r') as f:
 assert np.all(lat == w_lat)
 
 #calculate windspeed and plot
-ws = (eco_u**2 + eco_v**2)**0.5
+ws = np.sqrt(np.add(np.square(eco_u), np.square(eco_v)))
 max_ws = np.nanmax(ws)
 print("Eco maximum wind speed:", max_ws)
 c_inv = np.arange(0, 80, 1)
@@ -50,11 +50,11 @@ lat_mask = np.radians(expanded_lat)  # convert latitude from degrees to radians
 
 #unit conversion to m/s
 wu_mask = (w_u * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
-wv_mask = (w_v * 0.1 * 111 * 1000 * 0.69) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
+wv_mask = (w_v * 0.1 * 111 * 1000) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
                                                         #Minimizes RMSE but theoretically it shouldn't be needed.
 
 #calculate windspeed and plot
-ws = (wu_mask**2 + wv_mask**2)**0.5
+ws = np.sqrt(np.add(np.square(wu_mask), np.square(wv_mask)))
 max_ws = np.nanmax(ws)
 print("Windflow maximum wind speed:", max_ws)
 c_inv = np.arange(0, 80, 1)
