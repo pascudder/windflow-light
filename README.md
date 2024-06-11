@@ -14,9 +14,9 @@ See  `python predict.py` for a basic example.
 
 Usage for applying pretrained model to ECO1280 data
 
-### humidity.py
+### contour.py
 
-![eco1280 example](./humidity_plots/combined_humidity_quivers.png)
+![Contours](./contour_plots/combined_quiver.png)
 
 `gp_2016-06-01_00:00:00_P500_out.nc`
 
@@ -83,10 +83,9 @@ $$
 
 There is density scatter, normal scatter, and plots with difference between real u/v and computed u/v. 
 
-### contour.py
+### humidity.py
 
-![Contours](./contour_plots/combined_quiver.png)
-![Contours](./contour_plots/combined_contour_quivers.png)
+![eco1280 example](./humidity_plots/combined_humidity_quivers.png)
 
 
 Basically the same as humidity.py but instead of the original humidity data, this plots the wind speeds as a contour plot. 
