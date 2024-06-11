@@ -44,7 +44,7 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
     if not ax:
         ratio = 1. * u.shape[0] / u.shape[1]
         hi = int(ratio * size)
-        wi = int(size) * 2  # Double the width for side-by-side plots
+        wi = int(size) * 2 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(wi, hi), frameon=False)
         for ax in [ax1, ax2]:
             ax.axis('off')
@@ -113,12 +113,12 @@ def main():
 
 
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(40, 20))
+    fig, (ax1, ax2) = plt.subplots(2,1, figsize=(40, 20))
     ax1, ax2 = flow_quiver_plot(w_u, w_v, eco_u, eco_v, ax=(ax1, ax2),colorbar=True)
     ax1.set_title('Wind Flow Quiver')
     ax2.set_title('Eco Quiver')
     plt.tight_layout()
-    fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01, wspace=0.01, hspace=0.01)
+    fig.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05, wspace=0.05, hspace=0.05)
     plt.savefig('combined_quiver.png',bbox_inches='tight',dpi=300)
 
 if __name__ == '__main__':

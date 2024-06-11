@@ -45,13 +45,13 @@ max_ws_windflow = np.nanmax(ws_windflow)
 print("Windflow maximum wind speed:", max_ws_windflow)
 
 # Plotting side by side
-fig, axs = plt.subplots(1, 2, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
+fig, axs = plt.subplots(2,1, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
 
 # Plot ECO1280 data
 c_inv = np.arange(0, 80, 1)
 axs[0].coastlines(color='white')
 contour_eco = axs[0].contourf(lon, lat, ws_eco, c_inv, transform=ccrs.PlateCarree(), cmap=plt.cm.jet)
-cb_eco = fig.colorbar(contour_eco, ax=axs[0], orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
+cb_eco = fig.colorbar(contour_eco, ax=axs[0], orientation="vertical", pad=0.02, aspect=16, shrink=0.5)
 cb_eco.set_label('m/s', size=10, rotation=0, labelpad=15)
 cb_eco.ax.tick_params(labelsize=10)
 qv_eco = axs[0].quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='k')
@@ -60,12 +60,12 @@ axs[0].set_title('ECO1280')
 # Plot Windflow data
 axs[1].coastlines(color='white')
 contour_windflow = axs[1].contourf(lon, lat, ws_windflow, c_inv, transform=ccrs.PlateCarree(), cmap=plt.cm.jet)
-cb_windflow = fig.colorbar(contour_windflow, ax=axs[1], orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
+cb_windflow = fig.colorbar(contour_windflow, ax=axs[1], orientation="vertical", pad=0.02, aspect=16, shrink=0.5)
 cb_windflow.set_label('m/s', size=10, rotation=0, labelpad=15)
 cb_windflow.ax.tick_params(labelsize=10)
 qv_windflow = axs[1].quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='k')
 axs[1].set_title('Windflow displacement')
 
 plt.tight_layout()
-plt.savefig('combined_contour_quivers.png', dpi=300)
+plt.savefig('combined_contour_quivers.png',bbox_inches='tight', dpi=300)
 plt.show()
