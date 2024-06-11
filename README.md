@@ -57,7 +57,9 @@ latitude, longitude, and pressure level are the same in both of these files.
 
 ### scatter.py
 
-![scatter u](./scatterplots/scatter_density.ucomp_500_-90to90_pixel.png)
+![scatter u](./scatterplots/scatter_density.ucomp_500_90to90_pixel.png)
+![scatter v](./scatterplots/scatter_density.vcomp_500_90to90_pixel.png)
+
 
 1. Read in UV file and Humidity file
 2. Make windflow predictions on humidity data
