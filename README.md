@@ -1,8 +1,8 @@
-# windflow-light
+# windflow-light 
 
 Perform optical flow inference on geostationary satellite images from a pretrained RAFT model. 
 
-![windflow example](./examples/example-flows.png)
+![windflow example](./humidity_plots/Humidity.png)
 
 See  `python predict.py` for a basic example.
 
@@ -16,7 +16,7 @@ Usage for applying pretrained model to ECO1280 data
 
 ### humidity.py
 
-![eco1280 example](./examples/humidity_quivers_windflow2_Blues_short.png)
+![eco1280 example](./examples/combined_humidity_quivers.png)
 
 `gp_2016-06-01_00:00:00_P500_out.nc`
 
@@ -57,7 +57,7 @@ latitude, longitude, and pressure level are the same in both of these files.
 
 ### scatter.py
 
-![scatter u](./examples/scatter_density.ucomp_500_-30to30_pixel.png)
+![scatter u](./scatterplots/scatter_density.ucomp_500_-90to90_pixel.png)
 
 1. Read in UV file and Humidity file
 2. Make windflow predictions on humidity data
@@ -77,15 +77,13 @@ $$
 \text{ucomp} = \cos(lat) ~ \cdot ~ \text{upixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
 $$
 
-$\frac{1}{cos(lat)}$
-
 - This factor adjusts for the varying distance covered by a degree of longitude depending on the latitude. A degree of longitude represents a longer distance near the equator than it does closer to the poles. Since cos(lat) where latitude is in radians decreases as you move from the equator towards the poles, multiplying by cos(lat) correctly adjusts the longitudinal distance covered per pixel.
 
 There is density scatter, normal scatter, and plots with difference between real u/v and computed u/v. 
 
 ### contour.py
 
-![contour eco1280](./examples/contour_quivers_windflow.png)
+![contour eco1280](./contour_plots/combined_quiver.png)
 
 Basically the same as humidity.py but instead of the original humidity data, this plots the wind speeds as a contour plot. 
 
