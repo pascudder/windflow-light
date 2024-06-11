@@ -5,12 +5,12 @@ import cartopy.crs as ccrs
 import netCDF4 as nc
 from eco1280_loader import load_eco1280
 
-#Load ECO1280 data
-file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc' 
+# Load ECO1280 data
+file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc'
 file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
 eco_u, eco_v, lat, _ = load_eco1280(file1, file2)
 
-#Load windflow data (Run 'run_windflow.py' first)
+# Load windflow data (Run 'run_windflow.py' first)
 print('loading windflow data')
 with nc.Dataset('data.nc', 'r') as f:
     w_lat = f.variables['lat'][:]
@@ -21,53 +21,51 @@ with nc.Dataset('data.nc', 'r') as f:
     w_v = f.variables['vwind'][:]
 assert np.all(lat == w_lat)
 
-#calculate windspeed and plot
-ws = np.sqrt(np.add(np.square(eco_u), np.square(eco_v)))
-max_ws = np.nanmax(ws)
-print("Eco maximum wind speed:", max_ws)
+expanded_lat = np.tile(lat, (3600, 1)).T
+mask = (expanded_lat <= 90) & (expanded_lat >= -90) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
+
+
+lat_rad = np.radians(lat)
+lon_rad = np.radians(lon)
+a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
+d = 2 * 6378.137 * np.arcsin(a**0.5)
+size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
+w_u = w_u * size_per_pixel * 1000/ 10800
+w_v = w_v * size_per_pixel * 1000/ 10800
+
+
+# Calculate windspeed for ECO1280
+ws_eco = np.sqrt(np.add(np.square(eco_u), np.square(eco_v)))
+max_ws_eco = np.nanmax(ws_eco)
+print("Eco maximum wind speed:", max_ws_eco)
+
+# Calculate windspeed for Windflow
+ws_windflow = np.sqrt(np.add(np.square(w_u), np.square(w_v)))
+max_ws_windflow = np.nanmax(ws_windflow)
+print("Windflow maximum wind speed:", max_ws_windflow)
+
+# Plotting side by side
+fig, axs = plt.subplots(1, 2, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
+
+# Plot ECO1280 data
 c_inv = np.arange(0, 80, 1)
-fig = plt.figure(figsize=(13,7))
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax.coastlines(color='white')
-plt.contourf(lon, lat, ws, c_inv, transform=ccrs.PlateCarree(),cmap=plt.cm.jet) # takes some time
-cb = plt.colorbar(ax=ax, orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
-cb.set_label('m/s',size=10,rotation=0,labelpad=15)
-cb.ax.tick_params(labelsize=10)
+axs[0].coastlines(color='white')
+contour_eco = axs[0].contourf(lon, lat, ws_eco, c_inv, transform=ccrs.PlateCarree(), cmap=plt.cm.jet)
+cb_eco = fig.colorbar(contour_eco, ax=axs[0], orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
+cb_eco.set_label('m/s', size=10, rotation=0, labelpad=15)
+cb_eco.ax.tick_params(labelsize=10)
+qv_eco = axs[0].quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='k')
+axs[0].set_title('ECO1280')
 
-# there are too many u and v, we must splice
-# qv = plt.quiver(lon, lat, U2M_nans[0,:,:], V2M_nans[0,:,:], scale=350, color='k')
+# Plot Windflow data
+axs[1].coastlines(color='white')
+contour_windflow = axs[1].contourf(lon, lat, ws_windflow, c_inv, transform=ccrs.PlateCarree(), cmap=plt.cm.jet)
+cb_windflow = fig.colorbar(contour_windflow, ax=axs[1], orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
+cb_windflow.set_label('m/s', size=10, rotation=0, labelpad=15)
+cb_windflow.ax.tick_params(labelsize=10)
+qv_windflow = axs[1].quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='k')
+axs[1].set_title('Windflow displacement')
 
-#splice array:
-qv = plt.quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='k')
-plt.title('ECO1280')
 plt.tight_layout()
-plt.savefig('contour_quivers_eco.png',dpi = 300)
-
-
-expanded_lat = np.tile(lat, (3600,1)).T
-mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
-lat_mask = np.radians(expanded_lat)  # convert latitude from degrees to radians
-
-#unit conversion to m/s
-wu_mask = (w_u * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
-wv_mask = (w_v * 0.1 * 111 * 1000) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
-                                                        #Minimizes RMSE but theoretically it shouldn't be needed.
-
-#calculate windspeed and plot
-ws = np.sqrt(np.add(np.square(wu_mask), np.square(wv_mask)))
-max_ws = np.nanmax(ws)
-print("Windflow maximum wind speed:", max_ws)
-c_inv = np.arange(0, 80, 1)
-fig = plt.figure(figsize=(13,7))
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax.coastlines(color='white')
-plt.contourf(lon, lat, ws, c_inv, transform=ccrs.PlateCarree(),cmap=plt.cm.jet) # takes some time
-cb = plt.colorbar(ax=ax, orientation="vertical", pad=0.02, aspect=16, shrink=0.8)
-cb.set_label('m/s',size=10,rotation=0,labelpad=15)
-cb.ax.tick_params(labelsize=10)
-
-# splice array:
-qv = plt.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='k')
-plt.tight_layout()
-plt.title('Windflow displacement')
-plt.savefig('contour_quivers_windflow.png',dpi = 300)
+plt.savefig('combined_contour_quivers.png', dpi=300)
+plt.show()

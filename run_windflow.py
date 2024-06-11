@@ -4,12 +4,13 @@ import numpy as np
 from windflow import inference_flows
 from windflow.datasets.daves_grids import Eco
 import netCDF4 as nc
+import matplotlib.pyplot as plt
 
 
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
                                      overlap=128,
-                                     tile_size=512,
+                                     tile_size=1024,
                                      device=torch.device('cpu'),
                                      batch_size=1)
 inference.load_checkpoint(checkpoint_file)
@@ -37,8 +38,17 @@ except ValueError as e:
     print(e)
     raise
 
-
 _, flows = inference.forward(gp_rad1, gp_rad2)
+
+fig, axs = plt.subplots(1,2,figsize=(10,4))
+speed = (flows[0]**2 + flows[1]**2)**0.5
+axs = axs.flatten()
+axs[0].imshow(gp_rad1)
+axs[0].set_title("Input frame 1")
+axs[1].imshow(speed)
+axs[1].set_title("Flow Intensity")
+plt.tight_layout()
+plt.savefig("Humidity", dpi=200)
 
 w_u = flows[0]
 w_v = flows[1]

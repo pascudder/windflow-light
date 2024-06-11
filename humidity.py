@@ -20,14 +20,17 @@ with nc.Dataset('data.nc', 'r') as f:
     w_v = f.variables['vwind'][:]
 assert np.all(lat == w_lat)
 
-expanded_lat = np.tile(lat, (3600,1)).T
-mask = (expanded_lat <=90) & (expanded_lat >= -90) # mask the region of interest
-lat_mask = np.radians(expanded_lat)  # convert latitude from degrees to radians
+expanded_lat = np.tile(lat, (3600, 1)).T
+mask = (expanded_lat <= 90) & (expanded_lat >= -90) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
 
-#unit conversion to m/s
-wu_mask = (w_u * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800 #Could add a *1.12 scaling term to minimize RMSE.
-wv_mask = (w_v * 0.1 * 111 * 1000) / 10800 #The 0.69 multiplicative scaling vector was added after empirical testing
-                                                        #Minimizes RMSE but theoretically it shouldn't be needed.
+
+lat_rad = np.radians(lat)
+lon_rad = np.radians(lon)
+a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
+d = 2 * 6378.137 * np.arcsin(a**0.5)
+size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
+w_u = w_u * size_per_pixel * 1000/ 10800
+w_v = w_v * size_per_pixel * 1000/ 10800
 
 # Plot
 projection = ccrs.PlateCarree()
@@ -39,7 +42,7 @@ fig, axes = plt.subplots(1, 2, subplot_kw={'projection': projection}, figsize=(2
 ax = axes[0]
 im = ax.pcolormesh(lon, lat, gp_rad1, transform=projection, cmap=plt.cm.jet,vmax=140)
 qv_eco = ax.quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='black', width=0.0015, label='ECO1280')
-qv_wind = ax.quiver(lon[::60], lat[::40], wu_mask[::40, ::60].data, wv_mask[::40, ::60].data, color='red', width=0.0007, label='Windflow')
+qv_wind = ax.quiver(lon[::60], lat[::40], w_u[::40, ::60].data, w_v[::40, ::60].data, color='red', width=0.0007, label='Windflow')
 cbar = plt.colorbar(im, ax=ax, shrink=0.7, label='Humidity kg kg-1')
 ax.coastlines(color='white')
 ax.set_title('Combined Quivers - Snapshot 1')
@@ -49,7 +52,7 @@ ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.0))
 ax = axes[1]
 im = ax.pcolormesh(lon, lat, gp_rad2, transform=projection, cmap=plt.cm.jet,vmax=140)
 qv_eco = ax.quiver(lon[::60], lat[::40], eco_u[::40, ::60], eco_v[::40, ::60], color='black', width=0.0015, label='ECO1280')
-qv_wind = ax.quiver(lon[::60], lat[::40], wu_mask[::40, ::60], wv_mask[::40, ::60], color='red', width=0.0007, label='Windflow')
+qv_wind = ax.quiver(lon[::60], lat[::40], w_u[::40, ::60], w_v[::40, ::60], color='red', width=0.0007, label='Windflow')
 cbar = plt.colorbar(im, ax=ax, shrink=0.7, label='Humidity kg kg-1')
 ax.coastlines(color='white')
 ax.set_title('Combined Quivers - Snapshot 2')

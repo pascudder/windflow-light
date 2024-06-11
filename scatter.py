@@ -7,7 +7,7 @@ from matplotlib.colors import Normalize
 from scipy.interpolate import interpn
 from eco1280_loader import load_eco1280
 import netCDF4 as nc
-
+from windflow.datasets import utils
 def main():
 
     # Load ECO1280 data
@@ -27,23 +27,26 @@ def main():
     assert np.all(lat == w_lat)
 
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 80) & (expanded_lat >= -80) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
-    lat_mask = np.radians(expanded_lat[mask])  # Convert latitude from degrees to radians
+    mask = (expanded_lat <= 90) & (expanded_lat >= -90) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
+
+
+    lat_rad = np.radians(lat)
+    lon_rad = np.radians(lon)
+    a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
+    d = 2 * 6378.137 * np.arcsin(a**0.5)
+    size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
+    w_u = w_u * size_per_pixel * 1000/ 10800
+    w_v = w_v * size_per_pixel * 1000/ 10800
 
     # Select masked regions
-    eu_mask = eco_u[mask]
-    ev_mask = eco_v[mask]
-
-    wu_mask = w_u[mask]
-    wv_mask = w_v[mask]
-
-    # Unit conversion to m/s
-    wu_mask = (wu_mask * 0.1 * 111 * 1000 * np.cos(lat_mask)) / 10800  # Could add a *1.12 scaling term to minimize RMSE.
-    wv_mask = (wv_mask * 0.1 * 111 * 1000) / 10800  # Could add .69 scaling vector to minimize RMSE (or cos??)
+    eco_u = eco_u[mask]
+    eco_v = eco_v[mask]
+    w_u = w_u[mask]
+    w_v = w_v[mask]
 
     # Calculate RMSE of u component
-    x = eu_mask
-    y = wu_mask
+    x = eco_u
+    y = w_u
     print(f'RMSE: u: {np.sqrt(np.nanmean((y-x)**2))}')
 
     # U component plots
@@ -67,8 +70,8 @@ def main():
     plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png", bbox_inches='tight')
 
     # Calculate RMSE of v component
-    x = ev_mask
-    y = wv_mask
+    x = eco_v
+    y = w_v
 
     print(f'RMSE: v: {np.sqrt(np.nanmean((y-x)**2))}')
 
