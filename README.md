@@ -16,7 +16,7 @@ Usage for applying pretrained model to ECO1280 data
 
 ### humidity.py
 
-![eco1280 example](./examples/combined_humidity_quivers.png)
+![eco1280 example](./humidity_plots/combined_humidity_quivers.png)
 
 `gp_2016-06-01_00:00:00_P500_out.nc`
 
