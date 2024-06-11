@@ -27,16 +27,7 @@ def main():
     assert np.all(lat == w_lat)
 
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 90) & (expanded_lat >= -90) & ((gp_rad1 > 0) | (gp_rad2 > 0)) # Mask the region of interest, as well as the minimum humidity value.
-
-
-    lat_rad = np.radians(lat)
-    lon_rad = np.radians(lon)
-    a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
-    d = 2 * 6378.137 * np.arcsin(a**0.5)
-    size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
-    w_u = w_u * size_per_pixel * 1000/ 10800
-    w_v = w_v * size_per_pixel * 1000/ 10800
+    mask = (expanded_lat <= 90) & (expanded_lat >= -90) # Mask the region of interest, as well as the minimum humidity value.
 
     # Select masked regions
     eco_u = eco_u[mask]

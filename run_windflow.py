@@ -6,7 +6,6 @@ from windflow.datasets.daves_grids import Eco
 import netCDF4 as nc
 import matplotlib.pyplot as plt
 
-
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
                                      overlap=128,
@@ -51,8 +50,16 @@ plt.tight_layout()
 plt.savefig("Humidity", dpi=200)
 
 w_u = flows[0]
-w_v = flows[1]
+w_v = -flows[1] #flip v parameter
 
+#convert to m/s
+lat_rad = np.radians(lat)
+lon_rad = np.radians(lon)
+a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
+d = 2 * 6378.137 * np.arcsin(a**0.5)
+size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
+w_u = w_u * size_per_pixel * 1000/ 10800
+w_v = w_v * size_per_pixel * 1000/ 10800
 
 def save_data():
     with nc.Dataset('data.nc', 'w') as f:
@@ -66,7 +73,7 @@ def save_data():
         flow2 = f.createVariable('vwind', np.float32, ('lat', 'lon'))
         
         flow1[:, :] = w_u
-        flow2[:, :] = -w_v #flipping v parameter is now handled here
+        flow2[:, :] = w_v 
         lats[:] = lat
         lons[:] = lon
         gp_ra1[:, :] = gp_rad1
