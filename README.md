@@ -53,25 +53,16 @@ latitude, longitude, and pressure level are the same in both of these files.
 
 ### eco1280_loader.py
 
-1. Read in UV Component file; extract lat, lon, u and v comp. 
-2. Read in Humidity file; extract humidity data, scale  or perform preprocessing if necessary ( This particular example scales by 25000 since the ECO1280 data was scaled by that amount. We want our humidity values to be in the 0 to 255 range)
+1. Read in UV Component file; extract and return lat, lon, u and v comp. 
 
 ### run_windflow.py
 
-1. Load model checkpoint. 
-2. perform inference on the model with the humidity data. The preprocessed humidity data is fed into the model to compute flows between the two time steps. This produces predictions for the u and v in units of **pixels displacement**
-3. Convert pixel displacement to v component in units of m/s. Since these images are 3 hours apart, you divide by 3 * 60 * 60 = 10800 to get units of seconds. 
-$$
-\text{vcomp} = \text{vpixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
-$$
-    
-    remember to negate vpixel before doing this. 
-
-$$
-\text{ucomp} = \cos(lat) ~ \cdot ~ \text{upixel}~ \cdot ~\frac{0.1 ~\text{deg}}{1 ~\text{pixel}} ~ \cdot ~ \frac{111 ~ \text{km}}{1 ~ \text{degree}} ~ \cdot ~ \frac{1000m}{\text{km}} ~ \cdot ~ \frac{1}{10800\text{sec}}
-$$
-
-4. Data is saved to data.nc for later use.
+1. Read in Humidity file; extract humidity data, scale  or perform preprocessing if necessary ( This particular example scales by 25000 since the ECO1280 data was scaled by that amount. We want our humidity values to be in the 0 to 255 range)
+2. Load model checkpoint. Set the tile size and overlap: Larger tile size should result in increased accuracy(and computation cost). Overlap is currently at 25% of tile size.
+3. Perform inference on the model with the humidity data. The preprocessed humidity data is fed into the model to compute flows between the two time steps. This produces predictions for the u and v in units of **pixels displacement**
+4. Convert pixel displacement to speed in units of m/s. We are using the haversine formula to calculate the size of each pixel, as we need to convert from a rectangular image to a sphere.
+5. Since these images are 3 hours apart, you divide by 3 * 60 * 60 = 10800 to get units of seconds. 
+6. Data is saved to data.nc for later use.
 
 ### scatter.py
 
