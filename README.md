@@ -96,8 +96,8 @@ $$
 
 ### scatter.py
 
-![scatter u](./scatterplots/scatter_density.ucomp_500_90to90_pixel.png)
-![scatter v](./scatterplots/scatter_density.vcomp_500_90to90_pixel.png)
+![scatter u](./scatterplots/scatter_density_ucomp_500.png)
+![scatter v](./scatterplots/scatter_density_vcomp.png)
 
 
 1. Read in UV file and Humidity file
