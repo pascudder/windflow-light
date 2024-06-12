@@ -61,8 +61,39 @@ latitude, longitude, and pressure level are the same in both of these files.
 2. Load model checkpoint. Set the tile size and overlap: Larger tile size should result in increased accuracy(and computation cost). Overlap is currently at 25% of tile size.
 3. Perform inference on the model with the humidity data. The preprocessed humidity data is fed into the model to compute flows between the two time steps. This produces predictions for the u and v in units of **pixels displacement**
 4. Convert pixel displacement to speed in units of m/s. We are using the haversine formula to calculate the size of each pixel, as we need to convert from a rectangular image to a sphere.
-5. Since these images are 3 hours apart, you divide by 3 * 60 * 60 = 10800 to get units of seconds. 
-6. Data is saved to data.nc for later use.
+
+# Step 1: Calculate Intermediate Variable \( a \)
+
+\[ 
+a = \cos(\text{lat\_rad})^2 \cdot \sin\left(\frac{\text{lon\_rad}[1] - \text{lon\_rad}[0]}{2}\right)^2 
+\]
+
+# Step 2: Calculate Distance \( d \)
+
+\[ 
+d = 2 \cdot (\text{equatorial\_radius\_of\_earth} + \text{height\_of\_atmosphere}) \cdot \arcsin(\sqrt{a}) \quad \text{(in km)}
+\]
+
+# Step 3: Calculate Size Per Pixel
+
+\[ 
+\text{size\_per\_pixel} = \text{np.repeat(np.expand\_dims(d, -1), len(lon\_rad), axis=1)} \quad \text{(in km)}
+\]
+
+### Step 4: Convert to Meters
+
+\[ 
+\text{size\_per\_pixel\_m} = \text{size\_per\_pixel} \times 1000 \quad \text{(in meters)}
+\]
+
+### Step 5: Convert to Meters Per Second
+
+Since these images are 3 hours apart, divide by \(3 \times 60 \times 60 = 10800\) to get units of seconds.
+
+\[ 
+\text{size\_per\_pixel\_mps} = \frac{\text{size\_per\_pixel\_m}}{10800} \quad \text{(in m/s)}
+\]
+
 
 ### scatter.py
 
