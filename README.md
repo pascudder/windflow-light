@@ -62,15 +62,13 @@ latitude, longitude, and pressure level are the same in both of these files.
 3. Perform inference on the model with the humidity data. The preprocessed humidity data is fed into the model to compute flows between the two time steps. This produces predictions for the u and v in units of **pixels displacement**
 4. Convert pixel displacement to speed in units of m/s. We are using the haversine formula to calculate the size of each pixel, as we need to convert from a rectangular image to a sphere.
 
-## Formula
-
-Calculate Intermediate Variable \( a \)
+Calculate Intermediate Variable \(a\)
 
 $$
 a = \cos(\text{lat\_rad})^2 \cdot \sin\left(\frac{\text{lon\_rad}[1] - \text{lon\_rad}[0]}{2}\right)^2
 $$
 
-Calculate Distance \( d \)
+Calculate Distance \(d\)
 
 $$
 d = 2 \cdot (\text{equatorial\_radius\_of\_earth} + \text{height\_of\_atmosphere}) \cdot \arcsin(\sqrt{a}) \quad \text{(in km)}
