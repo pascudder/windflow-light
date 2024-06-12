@@ -42,12 +42,12 @@ _, flows = inference.forward(gp_rad1, gp_rad2)
 fig, axs = plt.subplots(1,2,figsize=(10,4))
 speed = (flows[0]**2 + flows[1]**2)**0.5
 axs = axs.flatten()
-axs[0].imshow(gp_rad1)
+axs[0].imshow(gp_rad1,vmax = 125)
 axs[0].set_title("Input frame 1")
 axs[1].imshow(speed)
 axs[1].set_title("Flow Intensity")
 plt.tight_layout()
-plt.savefig("Humidity", dpi=200)
+plt.savefig("Humidity.png", dpi=200)
 
 w_u = flows[0]
 w_v = -flows[1] #flip v parameter
@@ -56,7 +56,7 @@ w_v = -flows[1] #flip v parameter
 lat_rad = np.radians(lat)
 lon_rad = np.radians(lon)
 a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
-d = 2 * 6378.137 * np.arcsin(a**0.5)
+d = 2 * 6376.5 * np.arcsin(a**0.5) #d needs to be updated depending on the pressure level. Since P = 500 is 5.5 KM above the earth's surface on average, we take the mean radius of the earth (6371 KM) and add 5.5.
 size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
 w_u = w_u * size_per_pixel * 1000/ 10800
 w_v = w_v * size_per_pixel * 1000/ 10800
