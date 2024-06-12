@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
-                                     overlap=128,
+                                     overlap=256,
                                      tile_size=1024,
                                      device=torch.device('cpu'),
                                      batch_size=1)
