@@ -85,7 +85,7 @@ There is density scatter, normal scatter, and plots with difference between real
 
 ### humidity.py
 
-![eco1280 example](./humidity_plots/combined_humidity_quivers.png)
+![eco1280 example](./humidity_plots/combined_humidity_quivers.gif)
 
 
 Basically the same as humidity.py but instead of the original humidity data, this plots the wind speeds as a contour plot. 
