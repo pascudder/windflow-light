@@ -65,25 +65,25 @@ latitude, longitude, and pressure level are the same in both of these files.
 Calculate Intermediate Variable \(a\)
 
 $$
-a = \cos(\text{latrad})^2 \cdot \sin\left(\frac{\text{lonrad}[1] - \text{lonrad}[0]}{2}\right)^2
+a = \cos(\text{lat})^2 \cdot \sin\left(\frac{\text{lon}[1] - \text{lon}[0]}{2}\right)^2
 $$
 
 Calculate Distance \(d\)
 
 $$
-d = 2 \cdot (\text{equatorialradiusofearth} + \text{heightofatmosphere}) \cdot \arcsin(\sqrt{a}) \quad \text{(in km)}
+d = 2 \cdot (\text{equatorial radius of earth} + \text{height of atmosphere}) \cdot \arcsin(\sqrt{a}) \quad \text{(in km)}
 $$
 
 Calculate Size Per Pixel
 
 $$
-\text{sizeperpixel} = \text{np.repeat(np.expanddims(d, -1), len(lonrad), axis=1)} \quad \text{(in km)}
+\text{size per pixel} = \text{np.repeat(np.expanddims(d, -1), len(lonrad), axis=1)} \quad \text{(in km)}
 $$
 
 Convert to Meters
 
 $$
-\text{sizeperpixelm} = \text{sizeperpixel} \times 1000 \quad \text{(in meters)}
+\text{size per pixel} = \text{size per pixel} \times 1000 \quad \text{(in meters)}
 $$
 
 Convert to Meters Per Second
@@ -91,13 +91,7 @@ Convert to Meters Per Second
 Since these images are 3 hours apart, divide by \(3 \times 60 \times 60 = 10800\) to get units of seconds.
 
 $$
-\text{sizeperpixelmps} = \frac{\text{sizeperpixelm}}{10800} \quad \text{(in m/s)}
-$$
-
-Convert Pixel Displacement to Wind Component in m/s
-
-$$
-\text{vcomp} = \text{vpixel} \cdot \frac{0.1 \, \text{deg}}{1 \, \text{pixel}} \cdot \frac{111 \, \text{km}}{1 \, \text{degree}} \cdot \frac{1000 \, \text{m}}{1 \, \text{km}} \cdot \frac{1}{10800 \, \text{s}}
+\text{sizeperpixelmps} = \frac{\text{size per pixel}}{10800} \quad \text{(in m/s)}
 $$
 
 ### scatter.py
