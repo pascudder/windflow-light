@@ -22,7 +22,6 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
                      size=10, cmap='jet', colorbar=False):
     
     intensity = (u**2 + v**2) ** 0.5
-    intensity2 = (u2**2 + v2**2) ** 0.5
 
     u_l = downsample(u, down)
     v_l = downsample(v, down)
@@ -30,7 +29,6 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
     v2_l = downsample(v2, down)
 
     intensity_l = (u_l ** 2 + v_l**2) ** 0.5
-    intensity2_l = (u2_l ** 2 + v2_l**2) ** 0.5
 
     if (x is None) or (y is None):
         x = np.arange(0, u_l.shape[1]) * down + down/2.
@@ -53,12 +51,12 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
         ax1, ax2 = ax
     
     if vmax is None:
-        vmax = max(np.nanmax(intensity), np.nanmax(intensity2))
+        vmax = max(np.nanmax(intensity), np.nanmax(intensity))
     if vmin is None:
-        vmin = min(np.nanmin(intensity), np.nanmin(intensity2))
+        vmin = min(np.nanmin(intensity), np.nanmin(intensity))
     
     im1 = ax1.imshow(intensity, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
-    im2 = ax2.imshow(intensity2, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
+    im2 = ax2.imshow(intensity, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
     
     if colorbar:
         fig.colorbar(im1, ax=ax1, label='Wind Speed (m/s)', aspect=50, pad=0.01, shrink=0.3)

@@ -27,7 +27,7 @@ def main():
     assert np.all(lat == w_lat)
 
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 90) & (expanded_lat >= -90) # Mask the region of interest, as well as the minimum humidity value.
+    mask = (expanded_lat <= 60) & (expanded_lat >= -60) # Mask the region of interest, as well as the minimum humidity value.
 
     # Select masked regions
     eco_u = eco_u[mask]
@@ -41,24 +41,18 @@ def main():
     print(f'RMSE: u: {np.sqrt(np.nanmean((y-x)**2))}')
 
     # U component plots
-    ax = scatter(x, y, s=1, textbox=(-18, 55))
-    ax.set_title("2016-06-01 00:00:00 P500 U component -90 to 90 lat")
-    ax.set_xlabel('ECO1280 u-component m/s')
-    ax.set_ylabel('Windflow u-component m/s')
-    plt.savefig("scatter.ucomp_500_90to90_pixel.png", bbox_inches='tight')
-
     ax = density_scatter(x, y, s=1, bins=150)
-    ax.set_title("2016-06-01 00:00:00 P500 U component density -90 to 90 lat")
+    ax.set_title("2016-06-01 00:00:00 P500 U component density -60 to 60 lat")
     ax.set_xlabel('ECO1280 u-component m/s')
     ax.set_ylabel('Windflow u-component m/s')
-    plt.savefig("scatter_density.ucomp_500_90to90_pixel.png", bbox_inches='tight')
+    plt.savefig("scatter_density_ucomp_500.png", bbox_inches='tight')
 
     udiff = (y - x)
     ax = scatter(udiff, expanded_lat[mask], axline=False)
     ax.set_title("2016-06-01 00:00:00 P500 U diff (windflow - eco) vs lat")
     ax.set_xlabel('Udiff u-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
-    plt.savefig("scatter_lat.ucomp_500_90to90_pixel.png", bbox_inches='tight')
+    plt.savefig("scatter_lat_ucomp_500.png", bbox_inches='tight')
 
     # Calculate RMSE of v component
     x = eco_v
@@ -67,24 +61,19 @@ def main():
     print(f'RMSE: v: {np.sqrt(np.nanmean((y-x)**2))}')
 
     # V component plots
-    ax = scatter(x, y, s=1, textbox=(-18, 35))
-    ax.set_title("2016-06-01 00:00:00 P500 V component 90 to 90 lat")
-    ax.set_xlabel('ECO1280 v-component m/s')
-    ax.set_ylabel('Windflow v-component m/s')
-    plt.savefig("scatter.vcomp_500_90to90_pixel.png", bbox_inches='tight')
 
     ax = density_scatter(x, y, s=1, bins=150)
     ax.set_title("2016-06-01 00:00:00 P500 V component density -90 to 90 lat")
     ax.set_xlabel('ECO1280 v-component m/s')
     ax.set_ylabel('Windflow v-component m/s')
-    plt.savefig("scatter_density.vcomp_500_90to90_pixel.png", bbox_inches='tight')
+    plt.savefig("scatter_density_vcomp_500.png", bbox_inches='tight')
 
     vdiff = (y - x)
     ax = scatter(vdiff, expanded_lat[mask], axline=False)
     ax.set_title("2016-06-01 00:00:00 P500 V diff (windflow - eco) vs lat")
     ax.set_xlabel('Vdiff v-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
-    plt.savefig("scatter_lat.vcomp_500_90to90_pixel.png", bbox_inches='tight')
+    plt.savefig("scatter_lat.vcomp_500.png", bbox_inches='tight')
 
 def scatter(x, y, s=1, textbox=(0, 0), axline=True):
     fig, ax = plt.subplots(figsize=(8, 8))

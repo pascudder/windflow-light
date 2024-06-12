@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 checkpoint_file = 'model_weights/windflow.raft.pth.tar'
 inference = inference_flows.FlowRunner('RAFT',
-                                     overlap=256,
+                                     overlap=512,
                                      tile_size=1024,
                                      device=torch.device('cpu'),
                                      batch_size=1)
@@ -58,8 +58,8 @@ lon_rad = np.radians(lon)
 a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
 d = 2 * 6376.5 * np.arcsin(a**0.5) #d needs to be updated depending on the pressure level. Since P = 500 is 5.5 KM above the earth's surface on average, we take the mean radius of the earth (6371 KM) and add 5.5.
 size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
-w_u = w_u * size_per_pixel * 1000/ 10800
-w_v = w_v * size_per_pixel * 1000/ 10800
+w_u = w_u * size_per_pixel * 1000 / 10800
+w_v = w_v * size_per_pixel * 1000 * 0.8 / 10800 #scale by 0.8 to remove bias
 
 def save_data():
     with nc.Dataset('data.nc', 'w') as f:
