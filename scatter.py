@@ -25,9 +25,9 @@ def main():
         w_u = f.variables['uwind'][:]
         w_v = f.variables['vwind'][:]
     assert np.all(lat == w_lat)
-
+    
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 60) & (expanded_lat >= -60) # Mask the region of interest, as well as the minimum humidity value.
+    mask = (expanded_lat <= 30) & (expanded_lat >= -30) # Mask the region of interest, as well as the minimum humidity value.
 
     # Select masked regions
     eco_u = eco_u[mask]
