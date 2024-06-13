@@ -8,6 +8,7 @@ from scipy.interpolate import interpn
 from eco1280_loader import load_eco1280
 import netCDF4 as nc
 from windflow.datasets import utils
+
 def main():
 
     # Load ECO1280 data
@@ -25,9 +26,10 @@ def main():
         w_u = f.variables['uwind'][:]
         w_v = f.variables['vwind'][:]
     assert np.all(lat == w_lat)
-    
+
     expanded_lat = np.tile(lat, (3600, 1)).T
-    mask = (expanded_lat <= 30) & (expanded_lat >= -30) # Mask the region of interest, as well as the minimum humidity value.
+    expanded_lon = np.tile(lon, (1801,1))
+    mask = (expanded_lat <= 90) & (expanded_lat >= -90) # Mask the region of interest, as well as the minimum humidity value.
 
     # Select masked regions
     eco_u = eco_u[mask]
@@ -42,7 +44,7 @@ def main():
 
     # U component plots
     ax = density_scatter(x, y, s=1, bins=150)
-    ax.set_title("2016-06-01 00:00:00 P500 U component density -60 to 60 lat")
+    ax.set_title("2016-06-01 00:00:00 P500 U component density -90 to 90 lat")
     ax.set_xlabel('ECO1280 u-component m/s')
     ax.set_ylabel('Windflow u-component m/s')
     plt.savefig("scatter_density_ucomp_500.png", bbox_inches='tight')
@@ -53,6 +55,13 @@ def main():
     ax.set_xlabel('Udiff u-component (windflow - eco) m/s')
     ax.set_ylabel('Latitude')
     plt.savefig("scatter_lat_ucomp_500.png", bbox_inches='tight')
+
+    udiff = (y - x)
+    ax = scatter(udiff, expanded_lon[mask], axline=False)
+    ax.set_title("2016-06-01 00:00:00 P500 U diff (windflow - eco) vs lon")
+    ax.set_xlabel('Udiff u-component (windflow - eco) m/s')
+    ax.set_ylabel('Longitude')
+    plt.savefig("scatter_lon_ucomp_500.png", bbox_inches='tight')
 
     # Calculate RMSE of v component
     x = eco_v
@@ -75,12 +84,19 @@ def main():
     ax.set_ylabel('Latitude')
     plt.savefig("scatter_lat.vcomp_500.png", bbox_inches='tight')
 
+    vdiff = (y - x)
+    ax = scatter(vdiff, expanded_lon[mask], axline=False)
+    ax.set_title("2016-06-01 00:00:00 P500 V diff (windflow - eco) vs lon")
+    ax.set_xlabel('Vdiff v-component (windflow - eco) m/s')
+    ax.set_ylabel('Longitude')
+    plt.savefig("scatter_lon.vcomp_500.png", bbox_inches='tight')
+
 def scatter(x, y, s=1, textbox=(0, 0), axline=True):
     fig, ax = plt.subplots(figsize=(8, 8))
    
     num_samples = len(x)
-    bias = np.nanmean(y - x)
-    rmse = np.sqrt(np.nanmean((y - x)**2))
+    bias = np.nanmean(x)
+    rmse = np.sqrt(np.nanmean((x**2)))
     
     ax.scatter(x, y, s=s)
     xmin, xmax = ax.get_xlim()

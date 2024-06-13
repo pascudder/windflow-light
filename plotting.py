@@ -22,22 +22,27 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
                      size=10, cmap='jet', colorbar=False):
     
     intensity = (u**2 + v**2) ** 0.5
+    intensity_1 = (u2**2 + v2**2) ** 0.5
 
     u_l = downsample(u, down)
     v_l = downsample(v, down)
     u2_l = downsample(u2, down)
     v2_l = downsample(v2, down)
 
-    intensity_l = (u_l ** 2 + v_l**2) ** 0.5
-
     if (x is None) or (y is None):
         x = np.arange(0, u_l.shape[1]) * down + down/2.
         y = np.arange(0, v_l.shape[0]) * down + down/2.
+        x1 = np.arange(0, u2_l.shape[1]) * down + down/2.
+        y1 = np.arange(0, v2_l.shape[0]) * down + down/2.
         X, Y = np.meshgrid(x, y)
+        X1,Y1 = np.meshgrid(x1,y1)
     else:
         x = downsample(x, down)
         y = downsample(y, down)
+        x1 = downsample(x,down)
+        y1 = downsample(y,down)
         X, Y = x, y
+        X1,Y1 = np.meshgrid(x1,y1)
 
     if not ax:
         ratio = 1. * u.shape[0] / u.shape[1]
@@ -51,12 +56,12 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
         ax1, ax2 = ax
     
     if vmax is None:
-        vmax = max(np.nanmax(intensity), np.nanmax(intensity))
+        vmax = max(np.nanmax(intensity),np.nanmax(intensity_1),)
     if vmin is None:
-        vmin = min(np.nanmin(intensity), np.nanmin(intensity))
+        vmin = min(np.nanmin(intensity),np.nanmin(intensity_1))
     
     im1 = ax1.imshow(intensity, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
-    im2 = ax2.imshow(intensity, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
+    im2 = ax2.imshow(intensity_1, origin='upper', cmap=cmap, vmax=vmax, vmin=vmin)
     
     if colorbar:
         fig.colorbar(im1, ax=ax1, label='Wind Speed (m/s)', aspect=50, pad=0.01, shrink=0.3)
@@ -64,11 +69,11 @@ def flow_quiver_plot(u, v, u2, v2, x=None, y=None, ax=None,
         
     scale = 150
     try:
-        ax1.quiver(X, Y, v_l, u_l, latlon=latlon, scale_units='inches', scale=scale)
-        ax2.quiver(X, Y, v2_l, u2_l, latlon=latlon, scale_units='inches', scale=scale)
+        ax1.quiver(X, Y, u_l, v_l, latlon=latlon, scale_units='inches', scale=scale)
+        ax2.quiver(X1, Y1, u2_l, v2_l, latlon=latlon, scale_units='inches', scale=scale)
     except: 
-        ax1.quiver(X, Y, v_l, u_l, scale_units='inches', scale=scale)
-        ax2.quiver(X, Y, v2_l, u2_l, scale_units='inches', scale=scale)
+        ax1.quiver(X, Y, u_l, v_l, scale_units='inches', scale=scale)
+        ax2.quiver(X1, Y1, u2_l, v2_l, scale_units='inches', scale=scale)
         
     for ax in [ax1, ax2]:
         if hasattr(ax, 'xaxis'):
