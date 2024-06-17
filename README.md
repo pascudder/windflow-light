@@ -16,7 +16,7 @@ Usage for applying pretrained model to ECO1280 data
 
 ### contour.py
 
-![Contours](./contour_plots/combined_quiver.png)
+![Contours](./contour_plots/combined_contour_quivers.png)
 
 Plot and compare wind vectors derived from the ECO1280 data with those inferred from the windflow model.
 
