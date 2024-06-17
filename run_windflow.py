@@ -31,13 +31,15 @@ gp_rad2 = gp_ds2['gp_newP']
 
 try:
     shape = np.shape(gp_rad1)
-    gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1]))
+    gp_rad1 = gp_rad1.values.reshape((shape[0], shape[1])) #remove 3rd dimension
     gp_rad2 = gp_rad2.values.reshape((shape[0], shape[1]))
 except ValueError as e:
     print(e)
     raise
 
 _, flows = inference.forward(gp_rad1, gp_rad2)
+w_u = flows[0]
+w_v = -flows[1] #flip v parameter
 
 fig, axs = plt.subplots(1,2,figsize=(10,4))
 speed = (flows[0]**2 + flows[1]**2)**0.5
@@ -48,9 +50,6 @@ axs[1].imshow(speed)
 axs[1].set_title("Flow Intensity")
 plt.tight_layout()
 plt.savefig("Humidity.png", dpi=200)
-
-w_u = flows[0]
-w_v = -flows[1] #flip v parameter
 
 #convert to m/s
 lat_rad = np.radians(lat)
