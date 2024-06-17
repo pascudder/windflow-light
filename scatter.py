@@ -29,7 +29,7 @@ def main():
 
     expanded_lat = np.tile(lat, (3600, 1)).T
     expanded_lon = np.tile(lon, (1801,1))
-    mask = (expanded_lat <= 90) & (expanded_lat >= -90) # Mask the region of interest, as well as the minimum humidity value.
+    mask = (expanded_lat <= 60) & (expanded_lat >= -60) # Mask the region of interest, as well as the minimum humidity value.
 
     # Select masked regions
     eco_u = eco_u[mask]
@@ -44,7 +44,7 @@ def main():
 
     # U component plots
     ax = density_scatter(x, y, s=1, bins=150)
-    ax.set_title("2016-06-01 00:00:00 P500 U component density -90 to 90 lat")
+    ax.set_title("2016-06-01 00:00:00 P500 U component density -60 to 60 lat")
     ax.set_xlabel('ECO1280 u-component m/s')
     ax.set_ylabel('Windflow u-component m/s')
     plt.savefig("scatter_density_ucomp_500.png", bbox_inches='tight')
@@ -72,7 +72,7 @@ def main():
     # V component plots
 
     ax = density_scatter(x, y, s=1, bins=150)
-    ax.set_title("2016-06-01 00:00:00 P500 V component density -90 to 90 lat")
+    ax.set_title("2016-06-01 00:00:00 P500 V component density -60 to 60 lat")
     ax.set_xlabel('ECO1280 v-component m/s')
     ax.set_ylabel('Windflow v-component m/s')
     plt.savefig("scatter_density_vcomp_500.png", bbox_inches='tight')
@@ -117,7 +117,6 @@ def density_scatter(x , y, s=1, axline=True, sort=True, bins=20, **kwargs):
     Scatter plot colored by 2d histogram.
     """
     fig, ax = plt.subplots(figsize=(8, 8))
-
     data, x_e, y_e = np.histogram2d(x, y, bins=bins, density=True, range=[[np.nanmin(x), np.nanmax(x)], [np.nanmin(y), np.nanmax(y)]])
     z = interpn((0.5*(x_e[1:] + x_e[:-1]), 0.5*(y_e[1:]+y_e[:-1])), data, np.vstack([x, y]).T, method="splinef2d", bounds_error=False)
 
