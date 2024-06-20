@@ -5,29 +5,24 @@ from windflow import inference_flows
 from windflow.datasets.daves_grids import Eco
 import netCDF4 as nc
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
 
-checkpoint_file = 'model_weights/windflow.raft.pth.tar'
-inference = inference_flows.FlowRunner('RAFT',
-                                     overlap=512,
-                                     tile_size=1024,
-                                     device=torch.device('cpu'),
-                                     batch_size=1)
-inference.load_checkpoint(checkpoint_file)
 
-file1 = './data/gp_2016-06-01_00:00:00_P500_out.nc'
-file2 = './data/gp_2016-06-01_03:00:00_P500_out.nc'
+file1 = './data/gp_2016-06-01_00:00:00_P500.nc'
+file2 = './data/gp_2016-06-01_03:00:00_P500.nc'
 
 gp_1 = Eco(file1)
-gp_ds1 = gp_1.open_dataset(scale_factor=32500, rescale=True)
+gp_ds1 = gp_1.open_dataset(scale_factor=25000, rescale=True)
 gp_2 = Eco(file2)
-gp_ds2 = gp_2.open_dataset(scale_factor=32500, rescale=True)
+gp_ds2 = gp_2.open_dataset(scale_factor=25000, rescale=True)
 
 lat = gp_ds1['lat_0'].values
 lon = gp_ds1['lon_0'].values
 
-gp_rad1 = gp_ds1['gp_newP']
+gp_rad1 = gp_ds1['gp_newP'][:,:,5] #select pressure level
 print(np.min(gp_rad1), np.max(gp_rad1))
-gp_rad2 = gp_ds2['gp_newP']
+gp_rad2 = gp_ds2['gp_newP'][:,:,5] #select pressure level
+
 
 try:
     shape = np.shape(gp_rad1)
@@ -37,9 +32,27 @@ except ValueError as e:
     print(e)
     raise
 
+projection = ccrs.PlateCarree()
+fig, ax = plt.subplots(subplot_kw={'projection': projection})
+ax.pcolormesh(lon,lat, gp_rad1, transform=projection)
+ax.coastlines()
+plt.savefig('data.png')
+
+
+checkpoint_file = 'model_weights/windflow.raft.pth.tar'
+inference = inference_flows.FlowRunner('RAFT',
+                                     overlap=512,
+                                     tile_size=1024,
+                                     device=torch.device('cpu'),
+                                     batch_size=1,
+                                     upsample_input=None,
+                                     )
+inference.load_checkpoint(checkpoint_file)
+
 _, flows = inference.forward(gp_rad1, gp_rad2)
 w_u = flows[0]
 w_v = -flows[1] #flip v parameter
+
 
 fig, axs = plt.subplots(1,2,figsize=(10,4))
 speed = (flows[0]**2 + flows[1]**2)**0.5
@@ -55,13 +68,13 @@ plt.savefig("Humidity.png", dpi=200)
 lat_rad = np.radians(lat)
 lon_rad = np.radians(lon)
 a = np.cos(lat_rad)**2 * np.sin((lon_rad[1]-lon_rad[0])/2)**2
-d = 2 * 6376.5 * np.arcsin(a**0.5) #d needs to be updated depending on the pressure level. Since P = 500 is 5.5 KM above the earth's surface on average, we take the mean radius of the earth (6371 KM) and add 5.5.
+d = 2 * 6378.137 * np.arcsin(a**0.5)
 size_per_pixel = np.repeat(np.expand_dims(d, -1), len(lon_rad), axis=1) # km
 w_u = w_u * size_per_pixel * 1000 / 10800
 w_v = w_v * size_per_pixel * 1000 * 0.8 / 10800 #scale by 0.8 to remove bias
 
 def save_data():
-    with nc.Dataset('data.nc', 'w') as f:
+    with nc.Dataset('data600.nc', 'w') as f:
         lat_ = f.createDimension('lat', len(lat))
         lon_ = f.createDimension('lon', len(lon))
         lats = f.createVariable('lat', np.float32, ('lat',))

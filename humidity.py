@@ -7,8 +7,8 @@ from PIL import Image
 import os
 
 # Load ECO1280 data
-file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc' 
-file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
+file1 = './data/uv_2016-06-01_00:00:00_PX.nc' 
+file2 = './data/uv_2016-06-01_03:00:00_PX.nc'
 eco_u, eco_v, lat, _ = load_eco1280(file1, file2)
 
 # Load windflow data (Run 'run_windflow.py' first)

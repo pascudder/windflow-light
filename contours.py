@@ -6,8 +6,8 @@ import netCDF4 as nc
 from eco1280_loader import load_eco1280
 
 # Load ECO1280 data
-file1 = './data/uv_2016-06-01_00:00:00_P500_out.nc'
-file2 = './data/uv_2016-06-01_03:00:00_P500_out.nc'
+file1 = './data/uv_2016-06-01_00:00:00_PX.nc'
+file2 = './data/uv_2016-06-01_03:00:00_PX.nc'
 eco_u, eco_v, lat, _ = load_eco1280(file1, file2)
 
 # Load windflow data (Run 'run_windflow.py' first)
@@ -35,7 +35,7 @@ print("Windflow maximum wind speed:", max_ws_windflow)
 fig, axs = plt.subplots(2,1, figsize=(20, 10), subplot_kw={'projection': ccrs.PlateCarree()})
 
 # Plot ECO1280 data
-c_inv = np.arange(0, 80, 1)
+c_inv = np.arange(0, max(max_ws_eco,max_ws_windflow), 1)
 axs[0].coastlines(color='white')
 contour_eco = axs[0].contourf(lon, lat, ws_eco, c_inv, transform=ccrs.PlateCarree(), cmap=plt.cm.jet)
 cb_eco = fig.colorbar(contour_eco, ax=axs[0], orientation="vertical", pad=0.02, aspect=16, shrink=0.5)

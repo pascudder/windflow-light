@@ -20,8 +20,8 @@ def load_eco1280(file1, file2):
     uv_2 = xr.open_dataset(file2)
 
     # Extract U and V components
-    u1 = uv_1['ugrd_newP']
-    v1 = uv_1['vgrd_newP']
+    u1 = uv_1['ugrd_newP'][:,:,5] #select pressure level
+    v1 = uv_1['vgrd_newP'][:,:,5] #select pressure level
 
     # Remove the third dimension
     eco_u = u1.values.reshape((1801, 3600))
