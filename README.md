@@ -1,17 +1,17 @@
 # windflow-light 
 
 ## Overview
-Predicting wind speeds using optical flow inference on ECO1280 radiance data from a pretrained RAFT model, and a model trained on the 500 millibar layer.
+Predicting wind speeds using optical flow inference on ECO1280 radiance data from a pretrained RAFT model, and a model trained on the 500 millibar layer with a 3-hour time increment.
 
 ![windflow example](./humidity_plots/Humidity.png)
 
 See  `python predict.py` for a basic example.
 
-## Install
+### Install
 
 `conda env create -f environment_cpu.yml`
 
-###Humidity Data
+### Humidity Data
 
 `gp_2016-06-01_00:00:00_P500_out.nc`
 
@@ -26,7 +26,7 @@ fields:
 | lat_0 | latitude |
 | lon_0 | longitude |
 
-##UV Components:
+### UV Components:
 
 `uv_2016-06-01_00:00:00_P500_out.nc`
 
@@ -57,7 +57,7 @@ latitude, longitude, and pressure level are the same in both of these files.
 ![scatter u](./scatterplots/scatter_density_ucomp_500.png)
 ![scatter v](./scatterplots/scatter_density_vcomp_500.png)
 
-###Results
+### Results
 
 ![eco1280 example](./humidity_plots/combined_humidity_quivers.gif)
 
