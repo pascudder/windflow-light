@@ -7,6 +7,10 @@ Predicting wind speeds using optical flow inference on ECO1280 radiance data fro
 
 See  `python predict.py` for a basic example.
 
+### Model Training
+
+The model was retrained on 3 months of G5NR data at the 500 millibar pressure level to 270,000 steps. The time increment between frames in the training data was adjusted to 3 hours to match the ECO1280 dataset. 
+
 ### Install
 
 `conda env create -f environment_cpu.yml`
@@ -62,8 +66,6 @@ latitude, longitude, and pressure level are the same in both of these files.
 ![eco1280 example](./humidity_plots/combined_humidity_quivers.gif)
 
 Inferred wind vectors (red) with the truth data (black) over a 3 hour time window.
-
-![Contours](./contour_plots/combined_contour_quivers.png)
  
 ## Citation
 
